@@ -80,7 +80,7 @@
         <h2>Please fill in your information</h2>
         <form id="login-form">
             <input type="text" id="username" placeholder="Name">
-            <input type="password" id="password" placeholder="Email">
+            <input type="text" id="password" placeholder="Email">
             <div class="error-message" id="error-message"></div>
             <button type="button" onclick="validateForm()">CONTINUE</button>
         </form>
@@ -92,7 +92,7 @@
             var errorMessage = document.getElementById("error-message");
 
             if (username === "" || password === "") {
-                errorMessage.textContent = "用户名和密码都是必填字段";
+                errorMessage.textContent = "Cannot be empty";
                 document.getElementById("username").style.border = "1px solid red";
                 document.getElementById("password").style.border = "1px solid red";
             } else {
