@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* 通用样式，不受屏幕尺寸影响 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .background-image {
+            background-size: cover;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.7;
+            z-index: -1;
+        }
+
+        .quiz-box {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        button {
+            background-color: #3B6362;
+            color: white;
+            padding: 25px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color:#3B6362;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            text-align: left;
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            font-size: 30px;
+        }
+
+        label:hover {
+            background-color: #e3e3e3;
+        }
+
+        h2, p {
+            margin: 10px 0;
+            font-size: 25px;
+        }
+
+        ul {
+            margin-top: 20px;
+        }
+
+        .result-image {
+            width: 680px;
+            height: 580px;
+        }
+
+        .logo {
+            max-width: 150px; /* 设置Logo的最大宽度 */
+            display: block; /* 让Logo居中显示 */
+            margin: 0 auto; /* 居中对齐 */
+            margin-bottom: 20px; /* 可根据需要调整下边距 */
+        }
+
+        .question-image {
+            max-width: 100%; /* 设置图片的最大宽度为100% */
+            height: 200px; /* 根据宽高比自适应高度 */
+            margin-top: 10px; /* 根据需要调整上边距 */
+        }
+
+        /* 响应式样式 */
+        @media (max-width: 768px) {
+            /* 在小屏幕上应用的样式 */
+            .quiz-box {
+                padding: 10px;
+                margin-left: 35px;
+                margin-right: 35px;
+            }
+            label {
+                font-size: 20px;
+            }
+            h2, p {
+                font-size: 20px;
+            }
+            .result-image {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+
+    <title>MBTI Test</title>
+</head>
+
+<body>
+    <div id="app">
+        <div class="quiz-container">
+            <div class="background-image"></div>
+            <div class="quiz-box">
+                <img src="images/p.jpg" alt="Logo" class="logo"> <!-- 新添加的Logo图像 -->
+                <div v-if="currentQuestion <= 11">
+                    <p>{{ questions[currentQuestion - 1].question }}</p>
+                    <img :src="'images/p' + currentQuestion + '.jpg'" alt="Question Image" class="question-image"> <!-- 新添加的问题图片 -->
+                    <ul>
+                        <li v-for="(option, index) in questions[currentQuestion - 1].options">
+                            <label>
+                                <input type="radio" :value="index" v-model="selectedOption">{{ option }}
+                            </label>
+                        </li>
+                    </ul>
+                    <button @click="nextQuestion">Next</button>
+                </div>
+                <div v-else>
+                    <div>
+                        <p> Results : Your personality type is: {{ getPersonalityType() }}</p>
+                        <img :src="resultImage" alt="Result Image" class="result-image">
+                    </div>
+                    <button @click="resetQuiz">Restart Quiz</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                currentQuestion: 1,
+                selectedOption: null,
+                resultImage: null,
+                answers: [0, 0, 0, 0],
+                questions: [
+                    {
+                        question: "Assuming you had a fortune, you would use it to support:",
+                        options: [
+                            "A) Environmental and charitable causes",
+                            "B) Scientific research and innovation projects",
+                            "C) Family and community development",
+                            "D) Education and school building"
+                        ]
+                    },
+                    {
+                        question: "If you had the opportunity to change one thing in the world, you would choose:",
+                        options: [
+                            "A) Promoting world peace and harmony",
+                            "B) Solving environmental problems and climate change",
+                            "C) Eradicate poverty and inequality",
+                            "D) Addressing the imbalance of educational resources"
+                        ]
+                    },
+                    {
+                        question: "Assuming that your life has no limitations, what lifestyle would you choose?",
+                        options: [
+                            "A) Exploration and adventure",
+                            "B) Learning and intellectual pursuits",
+                            "C) Happiness and fulfillment",
+                            "D) Lending a helping hand to those in need"
+                        ]
+                    },
+                    {
+                        question: "If your mind were compared to a type of weather, it would be:",
+                        options: [
+                            "A) Cloudy, always calm and rational",
+                            "B) Cloudy, sometimes excited, sometimes depressed",
+                            "C) Clear, full of positivity and sunshine",
+                            "D) Light rain, nourishing plant growth"
+                        ]
+                    },
+                    {
+                        question: "If you were in a challenging situation, you would tend to:",
+                        options: [
+                            "A) Calmly analyze the situation and develop a long-term strategy",
+                            "B) Make plans and act quickly",
+                            "C) Seek advice and support from others",
+                            "D) Patiently try and improve"
+                        ]
+                    },
+                    {
+                        question: "If your life were a novel, it would be:",
+                        options: [
+                            "A) A science fiction or fantasy novel",
+                            "B) An adventure story",
+                            "C) An emotional drama",
+                            "D) A history book"
+                        ]
+                    },
+                    {
+                        question: "Do you like places by the sea or lake? Is the beach or lake your favorite holiday destination?",
+                        options: [
+                            "A) I really like being by the sea because it makes me feel relaxed",
+                            "B) I don't like the beach",
+                            "C) I don't think there is any difference between living by a lake and a city",
+                            "D) I would like to live by the sea, but I can't give up the city life"
+                        ]
+                    },
+                    {
+                        question: "How important are you to cultural and recreational facilities? Cities usually offer more cultural and recreational activities.",
+                        options: [
+                            "A) I don't like to participate in social activities",
+                            "B) I like recreational activities, but I am afraid of indulging in entertainment",
+                            "C) I think it's okay to have entertainment but it's okay to have no entertainment",
+                            "D) I think both culture and entertainment are important, which can enrich my life"
+                        ]
+                    },
+                    {
+                        question: "Do you enjoy a multicultural society? Do you enjoy socializing with people from different backgrounds?",
+                        options: [
+                            "A) I think multiculturalism creates cultural invasion",
+                            "B) I don't know, I would make friends with people from different cultures if I had to",
+                            "C) I think it's nice to have some friends from different backgrounds but still prefer to stay with similar friends",
+                            "D) I enjoy being friends with people from different backgrounds and different nationalities, it's a culture shock"
+                        ]
+                    },
+                    {
+                        question: "If you were in an abandoned building, you would choose to:",
+                        options: [
+                            "A) Explore and explore the unknown",
+                            "B) Look for ancient artifacts and treasures",
+                            "C) Look for recyclable and discarded items",
+                            "D) Take photographs or create works of art"
+                        ]
+                    },
+                    {
+                        question: "Which season do you prefer:",
+                        options: [
+                            "A) Winter, full of calm and stability",
+                            "B) Summer, full of energy and sunshine",
+                            "C) Spring, full of hope and renewal",
+                            "D) Autumn, full of wisdom and change"
+                        ]
+                    }
+                ]
+            },
+            methods: {
+                nextQuestion() {
+                    if (this.selectedOption !== null) {
+                        this.answers[this.selectedOption]++;
+                        this.selectedOption = null;
+                        this.currentQuestion++;
+                    }
+                },
+                getPersonalityType() {
+                    const maxIndex = this.answers.indexOf(Math.max(...this.answers));
+                    switch (maxIndex) {
+                        case 0:
+                            this.resultImage = "images/politicians.jpg";
+                            return "Politicians";
+                        case 1:
+                            this.resultImage = "images/entrepreneurs.jpg";
+                            return "Entrepreneurs";
+                        case 2:
+                            this.resultImage = "images/farmers.jpg";
+                            return "Farmers";
+                        case 3:
+                            this.resultImage = "images/educator.jpg";
+                            return "Educators";
+                    }
+                },
+                resetQuiz() {
+                    this.currentQuestion = 1;
+                    this.selectedOption = null;
+                    this.resultImage = null;
+                    this.answers = [0, 0, 0, 0];
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
